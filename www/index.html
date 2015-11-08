@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+      html, body, #map-canvas {
+        height: 100px;
+        width: 100px;
+        margin: 5px;
+        padding: 5px;
+      }
+    </style>
+    <title>Compras a Domicilio</title>
+    <!-- Path to Framework7 Library CSS-->
+    <link rel="stylesheet" href="css/framework7.ios.min.css">
+    <link rel="stylesheet" href="css/framework7.ios.colors.min.css">
+    <!-- Path to your custom app styles-->
+    <link rel="stylesheet" href="css/my-app.css">
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjpwA8y03T5wJZIpBymB7R5Rgc94o_rIw"></script>
+
+<script type="text/javascript">
+
+
+var id, target, options;
+var posx,posy;
+
+function success(pos) {
+  var crd = pos.coords;
+  	posx=pos.coords.latitude;
+  	posy=pos.coords.longitude;
+  if (target.latitude === crd.latitude && target.longitude === crd.longitude) {
+    navigator.geolocation.clearWatch(id);
+  }
+};
+
+function error(err) {
+  console.warn('ERROR(' + err.code + '): ' + err.message);
+};
+
+target = {
+  latitude : 0,
+  longitude: 0,
+}
+
+options = {
+  enableHighAccuracy: false,
+  timeout: 5000,
+  maximumAge: 0
+};
+
+id = navigator.geolocation.watchPosition(success, error, options);
+
+
+function geoloc(){
+
+window.localStorage.setItem("ltx" , posx);
+window.localStorage.setItem("lty" , posy);
+self.location='geo.html';
+
+}
+
+function pon() {
+	if ((window.localStorage.getItem("naam")) !== null) {
+		var repartidor = window.localStorage.getItem("naam");
+	}else{
+		var repartidor = "No identificado";
+	}
+ 	document.getElementById("gebruiker").value = repartidor;
+	document.getElementById("numtick").value = "";
+}
+
+function opslaan(){
+    var repartidor = document.getElementById('repart').value;
+    if (repartidor !== ""){
+    window.localStorage.setItem("naam" , repartidor);
+    }
+    var pass = document.getElementById('passw').value;
+    if (pass !== ""){
+    window.localStorage.setItem("paswoord" , pass);
+    }
+    location.href="index.html";
+    pon();
+}
+
+function stop(){
+	location.href="index.html";
+    pon();
+}
+
+function actualizaReloj(){
+/*Script del Reloj */
+/* Capturamos la Hora, los minutos y los segundos */
+	marcacion = new Date()
+	/* Capturamos la Hora */
+	Hora = marcacion.getHours()
+	/* Capturamos los Minutos */
+	Minutos = marcacion.getMinutes()
+	/* Capturamos los Segundos */
+	Segundos = marcacion.getSeconds()
+	/* Si la Hora, los Minutos o los Segundos son Menores o igual a 9, le añadimos un 0 */
+	if (Hora <= 9) Hora = "0" + Hora
+	if (Minutos <= 9) Minutos = "0" + Minutos
+	if (Segundos <= 9) Segundos = "0" + Segundos
+	
+	
+	/*Script de la Fecha */
+	var Dia = new Array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo");
+	var Mes = new Array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", 
+	"Octubre", "Noviembre", "Diciembre");
+	var Hoy = new Date();
+	var Anio = Hoy.getFullYear();
+	var Fecha = Dia[Hoy.getDay()] + ", " + Hoy.getDate() + " de " + Mes[Hoy.getMonth()] + " de " + Anio + ". ";
+	
+	/* Creamos 2 variables para darle formato a nuestro Script */
+	var Script, Total
+	Script = Fecha + Hora + ":" + Minutos + ":" + Segundos + " ";
+	Total = Script;
+	
+	document.getElementById('Fecha_Reloj').innerHTML = Total;
+	setTimeout("actualizaReloj()", 1000);
+}
+
+function entrega(){
+
+	var repartidor = window.localStorage.getItem("naam");
+	var ticket = document.getElementById('numtick').value;
+	
+	if (ticket !== ""){
+	for (var i = 0; i < localStorage.length; i++){
+		countKey = localStorage.key(i);
+	}
+	i=i+1
+	window.localStorage.setItem(i , repartidor);
+	i=i+1
+	var tijd = ((((Date.now()/1000)/60)/60)/24);
+	window.localStorage.setItem(i , tijd);
+	i=i+1
+	var geopos = posx;
+	window.localStorage.setItem(i , geopos);
+	i=i+1
+	var geopos = posy;
+	window.localStorage.setItem(i , geopos);
+	i=i+1
+	window.localStorage.setItem(i , ticket);
+	alert(repartidor + ','+ tijd + ','  + geopos + ',' + ticket);	
+	pon();
+	}else{
+		alert('Introduce nº ticket');
+	}
+	
+}
+
+function borrar(){
+	
+var txt;
+var r = confirm("¿Seguro que quieres borrar todos los datos?");
+if (r == true) {
+    localStorage.clear();
+    alert('Los datos han sido eliminados')
+} 
+	
+}
+
+</script>
+</head>  
+
+
+  <body onload="pon(),actualizaReloj()">
+    <!-- Status bar overlay for fullscreen mode-->
+    <div class="statusbar-overlay"></div>
+    <!-- Panels overlay-->
+    <div class="panel-overlay"></div>
+    <!-- Left panel with reveal effect-->
+    <div class="panel panel-left panel-reveal">
+      <div class="content-block">
+        <p>Para Ayuda pulse aqui</p>
+      </div>
+    </div>
+    <!-- Right panel with cover effect-->
+    <div class="panel panel-right panel-cover">
+      <div class="content-block">
+      	<output id="home_network_button" data-icon="check">Internet Access Enabled</output>
+        </div>
+    </div>
+    <!-- Views-->
+    <div class="views">
+      <!-- Your main view, should have "view-main" class-->
+      <div class="view view-main">
+        <!-- Top Navbar-->
+        <div class="navbar">
+          <div class="navbar-inner">
+            <!-- We have home navbar without left link-->
+            <div class="center sliding">Control entrega compras</div>
+            <div class="right">
+              <!-- Right link contains only icon - additional "icon-only" class--><a href="#" class="link icon-only open-panel"> <i class="icon icon-bars"></i></a>
+            </div>
+          </div>
+        </div>
+        <!-- Pages, because we need fixed-through navbar and toolbar, it has additional appropriate classes-->
+        <div class="pages navbar-through toolbar-through">
+          <!-- Page, data-page contains page name-->
+          <div data-page="index" class="page">
+            <!-- Scrollable page content-->
+            <div class="page-content">
+              <div class="content-block-title">Repartidor</div>
+              <div class="content-block">
+                <div class="content-block-inner">
+                  <output type="text" id="gebruiker"></output>
+                  </div>
+                  <div class="list-block">
+					<ul>
+					  <li>
+					    <div class="item-content">
+					      <div class="item-media"><i class="icon icon-form-name"></i></div>
+					      <div class="item-inner"> 
+					        <div class="item-title label">ID compra</div>
+					        <div class="item-input">
+					          <input type="text" id="numtick" placeholder="Nº ticket" />
+					        </div>
+					      </div>
+					    </div>
+					  <li>
+					    <div class="item-content">
+					      <div class="item-media"><i class="icon icon-form-password"></i></div>
+					      <div class="item-inner"> 
+					        <div class="item-title label">Hora Entrega</div>
+					        <div class="item-input">
+					          <output type="date" id="Fecha_Reloj"></output>
+					        </div>
+					      </div>
+					    </div>
+					  </li>
+					 </ul>
+					</div>
+			      <div class="content-block">
+			        <div class="row">
+			          <div class="col-100">
+			          <input type="submit" value="Grabar Compra" class="button button-big button-fill color-green" onclick="entrega()"/></div>
+			          </div>
+			        </div>
+                </div>
+              <div class="content-block-title">Menu</div>
+              <div class="list-block">
+                <ul>
+                  <li><a href="login.html" class="item-link">
+                      <div class="item-content"> 
+                        <div class="item-inner">
+                          <div class="item-title">Identificacion</div>
+                        </div>
+                      </div></a></li>
+                </ul>
+                 <ul>
+                  <li><a href="disclaimer.html" class="item-link">
+                      <div class="item-content"> 
+                        <div class="item-inner">
+                          <div class="item-title">Disclaimer</div>
+                        </div>
+                      </div></a></li>
+                </ul>
+                 <ul>
+                  <li><a href="#" onclick="geoloc()" class="item-link">
+                      <div class="item-content"> 
+                        <div class="item-inner">
+                          <div class="item-title">Geolocalizacion</div>
+                        </div>
+                      </div></a></li>
+                </ul>
+              </div>
+              <div class="content-block-title">Side panels</div>
+              <div class="content-block">
+                <div class="row">
+                  <div class="col-50"><a href="#" data-panel="left" class="button open-panel">Links</a></div>
+                  <div class="col-50"><a href="#" data-panel="right" class="button open-panel">Informacion</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Bottom Toolbar-->
+        <div class="toolbar">
+          <div class="toolbar-inner"><a href="#" onclick="window.open('https://www.grear.es/', '_system', 'location=no');"  class="link">Grear</a><a href="#" onclick="window.open('https://spargrancanaria.net/indexon.php', '_system', 'location=no')" class="Intranet">BackOffice</a></div>
+        </div>
+      </div>
+    </div>
+    <!-- Path to Framework7 Library JS-->
+	<script type="text/javascript" src="cordova.j"></script>
+    <script type="text/javascript" src="js/framework7.min.js"></script>
+    <!-- Path to your app js-->
+    <script type="text/javascript" src="js/my-app.js"></script>
+    <script type="text/javascript">
+
+</script>
+
+  </body>
+</html>
